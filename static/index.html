@@ -64,6 +64,7 @@ world = {};
 
 //XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
+    console.log("trying to draw a circle!")
     with(context) {
         beginPath();              
         lineWidth = 3;
@@ -71,9 +72,14 @@ function drawCircle(context,entity) {
         var y = entity["y"];
         //moveTo(x,y);
         fillStyle = entity["colour"];
+
+        console.log(x);
+        console.log(y);
+        console.log(fillStyle);
         strokeStyle = fillStyle;
         arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
-        stroke();                                
+        stroke();           
+        console.log("circle drawn");                     
     }
 }
 
@@ -142,10 +148,8 @@ function getPosition(e) {
 
 
 function addEntity(entity, data) {
-    world[entity] = data;
     //XXX: Send a XHTML Request that updates the entity you just  modified!
-    sendJSONXMLHTTPRequest(`http://localhost:5000/entity/${entity}`,JSON.stringify(data),drawFrame);
-
+    sendJSONXMLHTTPRequest(`http://localhost:5000/entity/${entity}`,JSON.stringify(data),drawNextFrame);
 }
 
 var counter = 0;
@@ -193,7 +197,7 @@ mouse = (function() {
                 var y = pos[1];
 	        self.clicked = 1;
                 self.callListeners(self.mousedowners,x,y,self.clicked,e);
-                //addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+                addEntityWithoutName({'x':x,'y':y,'colour':'red'});
             }
         },
         mouseup: function(e) {
@@ -207,7 +211,7 @@ mouse = (function() {
 	        self.clicked = 0;
                 self.selected = -1;
                 self.callListeners(self.mouseuppers,x,y,self.clicked,e);
-                //addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+                addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
             }
         },
         touchstart: function(e) {
@@ -268,16 +272,36 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 });
 
 function updateWorld(new_world){
-    world = new_world
-    drawNextFrame();
+
+    if(new_world != world){
+        console.log("UPDATING WORLD!")
+        world = new_world
+        drawNextFrame();
+    }
+
     drawFrame();
 }
 
 
 function update() {
-    //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
-
-    sendJSONXMLHTTPRequest("http://localhost:5000/world",{},updateWorld)
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState==4) {
+            try {
+                if (xhr.status==200) {
+                    console.log("data received!")
+                    let data = JSON.parse(xhr.responseText);
+                    updateWorld(data);
+                }
+            } 
+            catch(e) {
+                alert('Error: ' + e.name);
+            }
+        }
+    };
+    xhr.open("GET","http://localhost:5000/world");
+    xhr.setRequestHeader("Accept","application/json")
+    xhr.send();
 
 }
 
