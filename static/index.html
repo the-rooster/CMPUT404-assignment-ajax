@@ -21,9 +21,10 @@
         limitations under the License.
     "/>
     <script src="json2.js"></script>
+    <link rel="stylesheet" href="index.css">
   </head> 
-  <body bgcolor="black" height="100%" width="100%"> 
-    <canvas id="c" width="100%" height="100%" style="-webkit-tap-highlight-color: transparent;"></canvas> 
+  <body bgColor="black" height="100%" width="100%"> 
+    <canvas class="canvas-background" id="c" width="100%" height="100%" ></canvas> 
     <script>
 var canvas = document.getElementById('c');
 var host = window.location.host;
@@ -65,12 +66,18 @@ world = {};
 //XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
     console.log("trying to draw a circle!")
+
+
+
     with(context) {
+        
         beginPath();              
         lineWidth = 3;
         var x = entity["x"];
         var y = entity["y"];
         //moveTo(x,y);
+
+
         fillStyle = entity["colour"];
 
         console.log(x);
@@ -78,7 +85,9 @@ function drawCircle(context,entity) {
         console.log(fillStyle);
         strokeStyle = fillStyle;
         arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
-        stroke();           
+        fill();
+        stroke();  
+       
         console.log("circle drawn");                     
     }
 }
@@ -105,6 +114,15 @@ function clearFrame() {
 // This actually draws the frame
 function renderFrame() {
     clearFrame();
+    with(context){
+        var grd = createLinearGradient(45, 300, 500,700, 3);
+        grd.addColorStop(0, "#332288");
+        grd.addColorStop(1, "#111122");
+        fillStyle = grd;
+        fillRect(0, 0, canvas.width, canvas.height);
+
+        stroke();
+    }
     for (var key in world) {
         var entity = world[key];
         drawCircle(context,prepEntity(entity));
@@ -155,7 +173,7 @@ function addEntity(entity, data) {
 var counter = 0;
 function addEntityWithoutName(data) {
     //var name = "X"+Math.floor((Math.random()*100)+1);
-    var name = "X"+(counter++)%100;
+    var name = "X"+(counter++);
     addEntity(name,data);
 }
 
@@ -197,7 +215,7 @@ mouse = (function() {
                 var y = pos[1];
 	        self.clicked = 1;
                 self.callListeners(self.mousedowners,x,y,self.clicked,e);
-                addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+                // addEntityWithoutName({'x':x,'y':y,'colour':'red'});
             }
         },
         mouseup: function(e) {
@@ -211,7 +229,7 @@ mouse = (function() {
 	        self.clicked = 0;
                 self.selected = -1;
                 self.callListeners(self.mouseuppers,x,y,self.clicked,e);
-                addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+                // addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
             }
         },
         touchstart: function(e) {
@@ -258,12 +276,11 @@ mouse = (function() {
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    console.log("click down")
-    addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
+    addEntityWithoutName({'x':x,'y':y,'colour':`purple`,'radius' : 40});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+    addEntityWithoutName({'x':x,'y':y,'colour':`purple`, 'radius' : 40});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
