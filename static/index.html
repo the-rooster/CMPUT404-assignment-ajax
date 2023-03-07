@@ -75,10 +75,16 @@ function drawCircle(context,entity) {
         lineWidth = 3;
         var x = entity["x"];
         var y = entity["y"];
+
+        for (let i in entity["colour"]){
+
+            entity["colour"][i] *= 361/Math.sqrt(x*x + y*y);
+        }
         //moveTo(x,y);
 
 
-        fillStyle = entity["colour"];
+        fillStyle = `rgb(${entity["colour"][0]},${entity["colour"][1]},${entity["colour"][2]})`
+
 
         console.log(x);
         console.log(y);
@@ -276,15 +282,15 @@ mouse = (function() {
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':`purple`,'radius' : 40});
+    addEntityWithoutName({'x':x,'y':y,'colour':[255,0,255],'radius' : 40});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':`purple`, 'radius' : 40});
+    addEntityWithoutName({'x':x,'y':y,'colour':[255,0,255], 'radius' : 40});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'green',
+    addEntityWithoutName({'x':x,'y':y,'colour':[255,255,255],
                           'radius':10});
 });
 
